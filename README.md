@@ -6,6 +6,12 @@
 - Output raw machine code to a file (possibly just ELF in the meantime)
 - Compile it in itself (that means no text-based programming languages)
 
+## Inspirations
+
+- [Kronark](https://www.youtube.com/@Kronark)
+- [Visual Language Proposal](https://coda.io/@xananax/visual-language-proposal)
+- ["Zoom Out": The missing feature of IDEs](https://medium.com/source-and-buggy/zoom-out-the-missing-feature-of-ides-f32d0f36f392)
+
 ## Editor Design
 
 - There will be a limited number of primitive blocks like input, output, etc.
