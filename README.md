@@ -8,6 +8,7 @@
 
 ## Inspirations
 
+- [Subtext](https://www.subtext-lang.org/)
 - [Kronark](https://www.youtube.com/@Kronark)
 - [Visual Language Proposal](https://coda.io/@xananax/visual-language-proposal)
 - ["Zoom Out": The missing feature of IDEs](https://medium.com/source-and-buggy/zoom-out-the-missing-feature-of-ides-f32d0f36f392)
@@ -22,6 +23,7 @@
 ## Stretch goals
 
 - Standardized source format
+  - It will be a binary format (as it will be decoded by visual tools rather than plaintext as an intermediate step)
 - Many targets
   - Archtectures
   - Platforms
@@ -32,11 +34,22 @@
   - Bootloader
   - OS kernel
   - Drivers
-  - Filesystem
+    - USB
+    - PCIe
+    - Keyboard
+    - Mouse
+    - Display
+  - Filesystems
+    - FAT32
+    - NTFS
+    - EXT4
+    - APFS
+    - Others
   - Optimizing Compiler
   - Debugger
   - Linker
   - Virtual Machine / Emulator
+  - Version Control
 
 Finally, I wanna be able to bootstrap this thing on a minimal environment. 
 
