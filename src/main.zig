@@ -204,13 +204,45 @@ const Mode = enum {
     Picker,
 };
 
+const Keybinding = struct {
+    key: [*:0]const u8,
+    description: [*:0]const u8,
+};
+
 const Editor = struct {
     mode: Mode,
     blocks: std.ArrayList(Block),
     cursor: usize = 0,
     picker_cursor: usize = 0,
     picker_active: bool = false,
-    available_blocks: *const [3]Block = &[_]Block{ Block.init_input(), Block.init_output(), Block.init(BlockType.middle) },
+    available_blocks: *const [2]Block = &[_]Block{ Block.init_input(), Block.init(BlockType.middle) },
+    show_help: bool = false,
+    keybindings: []const Keybinding = &[_]Keybinding{ //
+        Keybinding{
+            .key = "?",
+            .description = "Show help menu",
+        },
+        Keybinding{
+            .key = "Escape",
+            .description = "Change to Block Picking Mode",
+        },
+        Keybinding{
+            .key = "i",
+            .description = "Change to Edit Mode",
+        },
+        Keybinding{
+            .key = "j",
+            .description = "Down",
+        },
+        Keybinding{
+            .key = "j",
+            .description = "Up",
+        },
+        Keybinding{
+            .key = "Escape",
+            .description = "Exit help menu",
+        },
+    },
 
     fn init() Editor {
         var editor = Editor{ .mode = Mode.Navigate, .blocks = std.ArrayList(Block).init(GLOBAL_ALLOCATOR) };
@@ -228,12 +260,23 @@ const Editor = struct {
     fn respondToKey(self: *Editor) void {
         const key = raylib.getKeyPressed();
 
-        if (key == KeyboardKey.key_escape) {
+        if (key == KeyboardKey.key_i) {
             self.mode = Mode.Navigate;
         }
 
-        if (key == KeyboardKey.key_b) {
-            self.mode = Mode.Picker;
+        if (key == KeyboardKey.key_escape) {
+            if (self.show_help) {
+                self.show_help = false;
+            } else {
+                self.mode = Mode.Picker;
+            }
+        }
+
+        if (key == KeyboardKey.key_slash and
+            (raylib.isKeyDown(KeyboardKey.key_left_shift) or
+            raylib.isKeyDown(KeyboardKey.key_right_shift)))
+        {
+            self.show_help = true;
         }
 
         switch (self.mode) {
@@ -249,7 +292,7 @@ const Editor = struct {
                     self.cursor -|= 1;
                 }
                 if (key == KeyboardKey.key_n) {
-                    self.blocks.insert(self.cursor, Block.init(BlockType.middle)) catch |err| {
+                    self.blocks.insert(self.cursor, Block.init(self.available_blocks[self.picker_cursor].type)) catch |err| {
                         std.debug.panic("shit {}", .{err});
                     };
                 }
@@ -301,7 +344,7 @@ const Editor = struct {
         );
     }
 
-    fn draw_bar(self: *const Editor) void {
+    fn drawBar(self: *const Editor) void {
         const height = @as(f32, @floatFromInt(raylib.getScreenHeight()));
         const width = @as(f32, @floatFromInt(raylib.getScreenWidth()));
 
@@ -350,6 +393,27 @@ const Editor = struct {
             false => Color.dark_gray,
         });
     }
+
+    fn showHelpMenu(self: *const Editor) void {
+        const width = @as(f32, @floatFromInt(raylib.getScreenWidth()));
+        const height = @as(f32, @floatFromInt(raylib.getScreenWidth()));
+
+        raylib.drawRectangleRec(Rectangle.init(0, 0, width, height), BG_COLOR);
+        var max_width: i32 = 0;
+        for (self.keybindings) |keybind| {
+            const text_width = raylib.measureText(keybind.key, FONT_SIZE);
+            if (text_width > max_width) {
+                max_width = text_width;
+            }
+        }
+        for (self.keybindings, 0..) |keybind, i| {
+            const idx = @as(i32, @intCast(i));
+            const padding = @as(i32, @intFromFloat(PADDING));
+
+            raylib.drawText(keybind.key, padding, padding + ((FONT_SIZE + padding) * idx), FONT_SIZE, Color.black);
+            raylib.drawText(keybind.description, (padding * 2) + max_width, padding + (FONT_SIZE + padding) * idx, FONT_SIZE, Color.black);
+        }
+    }
 };
 
 pub fn main() !void {
@@ -393,7 +457,11 @@ pub fn main() !void {
 
         editor.drawPickerMenu(editor.picker_active);
 
-        editor.draw_bar();
+        editor.drawBar();
+
+        if (editor.show_help) {
+            editor.showHelpMenu();
+        }
 
         raylib.endDrawing();
     }
