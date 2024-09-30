@@ -22,6 +22,7 @@
         devShell = pkgs.mkShell {
           buildInputs = with pkgs; [
             just
+            entr
             zig
             zls
             glfw
