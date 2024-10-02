@@ -427,7 +427,7 @@ pub fn main() !void {
         .window_highdpi = true,
     });
 
-    raylib.initWindow(640, 480, "Block App");
+    raylib.initWindow(640, 480, "Viz");
 
     raylib.setExitKey(KeyboardKey.key_q);
     raylib.setWindowState(.{
